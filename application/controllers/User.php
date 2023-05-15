@@ -1,4 +1,4 @@
-<?php if(!defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 require APPPATH . '/core/AdminController.php';
 
@@ -10,7 +10,7 @@ class User extends AdminController
     public function __construct()
     {
         parent::__construct(ROLE_STAFF);
-        if( $this->staff['staff_auth']<4){
+        if ($this->staff['staff_auth'] < 4) {
             redirect('login');
         }
 
@@ -32,12 +32,12 @@ class User extends AdminController
     public function index()
     {
         $cond = $this->input->post('cond');
-        if(empty($cond)) $cond = $this->session->userdata($cond);
+        if (empty($cond)) $cond = $this->session->userdata($cond);
 
-        if ($this->staff['staff_auth']<5){
+        if ($this->staff['staff_auth'] < 5) {
             $cond['company_id'] = $this->staff['company_id'];
             $companies = $this->company_model->getListByCond($cond);
-        }else{
+        } else {
             $companies = $this->company_model->getListByCond([]);
         }
 
@@ -65,38 +65,38 @@ class User extends AdminController
         $this->load_view_with_menu("user/index");
     }
 
-    public function edit(){
+    public function edit()
+    {
         $user_id = $this->input->get('user_id');
         if (empty($user_id)) redirect('user/index');
 
         $mode = $this->input->post('mode');
-        if ($mode == 'delete'){
+        if ($mode == 'delete') {
             $this->user_model->delete_force($user_id, 'user_id');
             redirect('user/index');
-        }
+        } else {
+            $user = $this->user_model->getFromId($user_id);
 
-        $user = $this->user_model->getFromId($user_id);
+            $reg_data = $this->input->post('user');
 
-        $reg_data = $this->input->post('user');
+            if (!empty($reg_data)) {
+                $user['user_first_name'] = $reg_data['user_first_name'];
+                $user['user_last_name'] = $reg_data['user_last_name'];
+                $user['user_nick'] = $reg_data['user_nick'];
+                $user['user_email'] = $reg_data['user_email'];
+                $user['user_tel'] = $reg_data['user_tel'];
+                $user['user_sex'] = $reg_data['user_sex'];
+                if (!empty($reg_data['user_password'])) {
+                    $user['user_password'] = sha1($reg_data['user_password']);
+                }
 
-        if (!empty($reg_data)){
-            $user['user_first_name'] = $reg_data['user_first_name'];
-            $user['user_last_name'] = $reg_data['user_last_name'];
-            $user['user_nick'] = $reg_data['user_nick'];
-            $user['user_email'] = $reg_data['user_email'];
-            $user['user_tel'] = $reg_data['user_tel'];
-            $user['user_sex'] = $reg_data['user_sex'];
-            if(!empty($reg_data['user_password'])){
-                $user['user_password'] = sha1($reg_data['user_password']);
+                $this->user_model->updateRecord($user, 'user_id');
             }
 
-            $this->user_model->updateRecord($user, 'user_id');
+
+            $this->data['user'] = $user;
+
+            $this->load_view_with_menu("user/edit");
         }
-
-
-        $this->data['user'] = $user;
-
-        $this->load_view_with_menu("user/edit");
     }
-
 }
