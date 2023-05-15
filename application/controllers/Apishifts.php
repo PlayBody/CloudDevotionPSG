@@ -772,9 +772,11 @@ class Apishifts extends WebController
         $cond = json_decode($condition, true);
 
         $shifts = $this->shift_model->getListByCond($cond);
+        // echo $condition;
+
+        // return;
 
         $results['shifts'] = $shifts;
-
         echo json_encode($results);
     }
 
@@ -1184,8 +1186,9 @@ class Apishifts extends WebController
         $shiftData = $this->shift_model->getStaffShiftTime($staff_id, $organ_id);
 
         $results['isLoad'] = true;
-        $results['shift_apply_time'] = isset($shiftData['shift_apply_time']) ? abs($shiftData['shift_apply_time']) : 0;
-        $results['shift_application_time'] = isset($shiftData['shift_application_time']) ? abs($shiftData['shift_application_time']) : 0;
+        $results['staff_times'] = isset($shiftData['staff_times']) ? $shiftData['staff_times'] : "0";
+        // $results['shift_apply_time'] = isset($shiftData['shift_apply_time']) ? abs($shiftData['shift_apply_time']) : 0;
+        // $results['shift_application_time'] = isset($shiftData['shift_application_time']) ? abs($shiftData['shift_application_time']) : 0;
 
         echo json_encode($results);
     }

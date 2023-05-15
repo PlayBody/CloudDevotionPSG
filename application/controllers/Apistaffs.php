@@ -35,6 +35,8 @@ class Apistaffs extends WebController
 
         $staff = $this->staff_model->login($login_data);
 
+        log_message('debug', $login_data);
+
         $results = [];
         $results['isLogin'] = false;
         $results['err_type'] = '2';

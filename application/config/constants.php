@@ -122,23 +122,23 @@ define('MAIL_PATH',                             '/usr/sbin/sendmail');
 define('WORK_START', 10);
 define('WORK_END', 19);
 
-$attendance_status = array(
-	1 => '出勤',
-	2 => '退勤'
-);
+// $attendance_status = array(
+// 	1 => '出勤',
+// 	2 => '退勤'
+// );
 
-define('ATTENDANCE_STATUS', $attendance_status);
+// define('ATTENDANCE_STATUS', $attendance_status);
 
-$reserve_status = array(
-    'request' => 1,
-    'apply' => 2,
-    'reject' => 3,
-    'cancel' => 4,
-    'entering' => 5,
-    'complete' => 6
-);
+// $reserve_status = array(
+//     'request' => 1,
+//     'apply' => 2,
+//     'reject' => 3,
+//     'cancel' => 4,
+//     'entering' => 5,
+//     'complete' => 6
+// );
 
-define('RESERVE_STATUS', $reserve_status);
+// define('RESERVE_STATUS', $reserve_status);
 
 define('SHIFT_STATUS_SUBMIT', 1);
 define('SHIFT_STATUS_REJECT', 2);
@@ -150,18 +150,18 @@ define('SHIFT_STATUS_ME_REPLY', 7);
 define('SHIFT_STATUS_ME_APPLY', 9);
 define('SHIFT_STATUS_APPLY', 10);
 
-$shift_staus_array = array(
-    SHIFT_STATUS_SUBMIT => '申請中',
-    SHIFT_STATUS_REJECT => '拒否',
-    SHIFT_STATUS_OUT => '店外待機',
-    SHIFT_STATUS_REST => '休み',
-    SHIFT_STATUS_REQUEST => '出勤依頼',
-    SHIFT_STATUS_ME_REJECT => '出勤依頼 - 拒否',
-    SHIFT_STATUS_ME_REPLY => '回答済み',
-    SHIFT_STATUS_ME_APPLY => '回答済み-承認',
-    SHIFT_STATUS_APPLY => '承認',
-);
-define('SHIFT_STATUS_COMMENTS', $shift_staus_array);
+// $shift_staus_array = array(
+//     SHIFT_STATUS_SUBMIT => '申請中',
+//     SHIFT_STATUS_REJECT => '拒否',
+//     SHIFT_STATUS_OUT => '店外待機',
+//     SHIFT_STATUS_REST => '休み',
+//     SHIFT_STATUS_REQUEST => '出勤依頼',
+//     SHIFT_STATUS_ME_REJECT => '出勤依頼 - 拒否',
+//     SHIFT_STATUS_ME_REPLY => '回答済み',
+//     SHIFT_STATUS_ME_APPLY => '回答済み-承認',
+//     SHIFT_STATUS_APPLY => '承認',
+// );
+// define('SHIFT_STATUS_COMMENTS', $shift_staus_array);
 
 define('STAFF_AUTH_GUEST', 0);
 define('STAFF_AUTH_STAFF', 1);
@@ -190,6 +190,5 @@ define('RESERVE_CONDITION_DISABLE', 3);
 
 define('SQUARE_ENDPOINT_HOST', 'https://connect.squareupsandbox.com/');
 
-$week_array = array('日', '月', '火', '水', '木', '金', '土');
-
-define('WEEKS', $week_array);
+//$week_array = array('日', '月', '火', '水', '木', '金', '土');
+//define('WEEKS', ['日', '月', '火', '水', '木', '金', '土']);

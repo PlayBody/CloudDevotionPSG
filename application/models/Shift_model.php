@@ -14,7 +14,7 @@ class Shift_model extends Base_model
     public function getListByCond($cond){
 
         $this->db->from($this->table);
-        $this->db->join('staffs', 'staffs.staff_id = shifts.staff_id');
+        $this->db->join('staffs', 'staffs.staff_id = shifts.staff_id', 'left');
 
         if (!empty($cond['staff_id'])){
             $this->db->where('shifts.staff_id', $cond['staff_id']);
@@ -51,6 +51,10 @@ class Shift_model extends Base_model
         }
         if (!empty($cond['eq_to_time'])){
             $this->db->where("to_time", $cond['eq_to_time']);
+        }
+
+        if (!empty($cond['old_shift'])){
+            $this->db->where("old_shift", NULL);
         }
 
         if (!empty($cond['no_edit'])){
@@ -388,15 +392,32 @@ order by tmp.time
         return $query->row_array();
     }
 
+    // 승인시간과 근무요청시간에 대한 계산을 진행한다.
+
     public function getStaffShiftTime($staff_id, $organ_id) {
-        $strSql = "SELECT staff_id, sum(shift_apply_time) as shift_apply_time, sum(shift_application_time) as shift_application_time FROM 
-                    (SELECT staff_id, TIMESTAMPDIFF(MINUTE, from_time, to_time) shift_apply_time, 0 AS shift_application_time
-                        FROM shifts 
-                        WHERE (shift_type = 9 or shift_type=10) and staff_id=" . $staff_id . " and organ_id=" . $organ_id . "
-                    UNION
-                    SELECT staff_id, 0 AS shift_apply_time, TIMESTAMPDIFF(MINUTE, from_time, to_time) shift_application_time
-                        FROM shifts 
-                        WHERE (shift_type = 1 or shift_type=5) and staff_id=" . $staff_id . " and organ_id=" . $organ_id . ") as final";
+        $strSql = " SELECT
+                        SUM(staff_times) AS staff_times
+                    FROM
+                        (
+                        SELECT
+                            TIMESTAMPDIFF( MINUTE, from_time, to_time ) AS staff_times
+                        FROM
+                            shifts
+                        WHERE
+                            shift_type IN (1, 5, 9, 10)
+                            AND staff_id = ". $staff_id ."
+                            AND organ_id = ". $organ_id ."
+                        ) AS t1
+                    WHERE
+                        t1.staff_times > 0";
+        // $strSql = "SELECT staff_id, sum(shift_apply_time) as shift_apply_time, sum(shift_application_time) as shift_application_time FROM 
+        //             (SELECT staff_id, TIMESTAMPDIFF(MINUTE, from_time, to_time) shift_apply_time, 0 AS shift_application_time
+        //                 FROM shifts 
+        //                 WHERE (shift_type = 9 or shift_type=10) and staff_id=" . $staff_id . " and organ_id=" . $organ_id . "
+        //             UNION
+        //             SELECT staff_id, 0 AS shift_apply_time, TIMESTAMPDIFF(MINUTE, from_time, to_time) shift_application_time
+        //                 FROM shifts 
+        //                 WHERE (shift_type = 1 or shift_type=5) and staff_id=" . $staff_id . " and organ_id=" . $organ_id . ") as final";
 
         $query = $this->db->query($strSql);
 
@@ -478,7 +499,7 @@ order by tmp.time
         }else{
             $strSql .=" ORDER BY apply desc, rest asc, reserve desc, link desc, submit desc, pshift desc, staff_shift desc, time asc ";
         }
-        
+
         $query = $this->db->query($strSql);
 
         return $query->result_array();

@@ -23,12 +23,39 @@ class Managements extends WebController
         $this->load->model('shifts/shift_rest_model');
     }
 
-    public function loadInit(){
+    public function loadInitPsg(){
         $organ_id = $this->input->get_post('organ_id');
         $from_time = $this->input->get_post('from_time');
         $to_time = $this->input->get_post('to_time');
 
         $counts = $this->setting_count_shift_model->getListByCond(['organ_id' => $organ_id, 'from_time' => $from_time, 'to_time' => $to_time]);
+        
+        for ($i=0; $i < count($counts); $i++) { 
+            // $counts[$i]['shifts'] = $this->shift_model->getListByCond(['organ_id' => $organ_id, 'from_time' => $counts[$i]['from_time'], 'to_time' => $counts[$i]['to_time'], 'psg'=>'1']);
+            // $apps = $this->shift_model->getListByCond(['organ_id' => $organ_id, 'from_time' => $counts[$i]['from_time'], 'to_time' => $counts[$i]['to_time'], 'is_apply' => '1']);
+
+            // $counts[$i]['apply'] = count($apps);
+            // $counts[$i]['count'] = count($counts[$i]['shifts']);//(!empty($cond['organ_id'])) ? count($counts[$i]['shifts']) : 0;
+            // $counts[$i]['shift'] = count($counts[$i]['shifts']);//(!empty($cond['organ_id'])) ? count($counts[$i]['shifts']) : 0;
+            $counts[$i]['apply'] = 0;
+            $counts[$i]['count'] = 0;
+            $counts[$i]['shift'] = 0;
+        }
+
+        $results['data'] = $counts;
+
+        echo json_encode($results);
+    }
+
+    public function loadInit(){
+        $organ_id = $this->input->get_post('organ_id');
+        $from_time = $this->input->get_post('from_time');
+        $to_time = $this->input->get_post('to_time');
+
+        // organ:에 대하여 주어진 시간구역에서의 요청자들의 시간구역을 얻는다.
+
+        $counts = $this->setting_count_shift_model->getListByCond(['organ_id' => $organ_id, 'from_time' => $from_time, 'to_time' => $to_time]);
+
         $times = [];
         foreach($counts as $count){
             if(!array_search($count['from_time'], $times) && (empty($times) || $times[0]!=$count['from_time'])) $times[] = $count['from_time'];

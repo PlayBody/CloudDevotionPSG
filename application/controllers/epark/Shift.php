@@ -54,11 +54,15 @@ class Shift extends AdminController
 
         $cur_time = new DateTime($cur_date);
         $shift_data = [];
+
+        // To Fix php version problem....
+        $weeks = array('日', '月', '火', '水', '木', '金', '土');
+
         while($cur_date<$next_first_date){
             $tmp = [];
             $day = $cur_time->format('d');
             $weekday = $cur_time->format('w');
-            $tmp['day_string'] = $cur_time->format('m月d日').'('.WEEKS[$weekday].')';
+            $tmp['day_string'] = $cur_time->format('m月d日').'('.$weeks[$weekday].')';
             $shifts = $this->shift_model->getListByCond(['select_date' => $cur_date]);
             foreach ($shifts as $shift){
                 $tmp[$shift['staff_id']][] = $shift;
