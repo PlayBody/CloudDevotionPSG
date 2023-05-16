@@ -21,6 +21,30 @@ class Shifts extends WebController
         $this->load->model('setting_init_shift_model');
     }
 
+
+    public function addNewStaffShift(){
+        $organ_id = $this->input->post('organ_id');
+        $staff_id = $this->input->post('staff_id');
+        $from_time = $this->input->post('from_time');
+        $to_time = $this->input->post('to_time');
+        $shift_type = $this->input->post('shift_type');
+
+        $shift = array(
+            'organ_id' => $organ_id,
+            'staff_id' => $staff_id,
+            'from_time' => $from_time,
+            'to_time' => $to_time,
+            'shift_type' => $shift_type,
+            'visible' => 1,
+        );
+        $shift_id = $this->shift_model->insertRecord($shift);
+        
+        $result['isSave'] = true;
+        $result['shift_id'] = $shift_id;
+        echo json_encode($result);
+    }
+
+
     public function saveStaffInput(){
         $shift_id = $this->input->post('shift_id');
         $organ_id = $this->input->post('organ_id');
@@ -100,13 +124,16 @@ class Shifts extends WebController
             'no_shift' => $shift_id,
         ]);
 
+        // 다른 시프트가 존재하면...
         if (!empty($exist_other_shifts)){
+            // 다른 시프트가 존재하므로 시간을 재검사할것을 요구.
             $results['isSave'] = false;
             $results['message'] = '入力したシフトが重複しました。時間を確認してください。';
             echo json_encode($results);
             return;
         }
 
+        // 작업계획이 준비된것이 있는가를 setting_cout_shift_model표에서 검색.
         // $isReadyCount = $this->isInCount($organ_id, $from_time, $to_time);
         $inner_counts = $this->setting_count_shift_model->getListByCond([
             'organ_id'=>$organ_id,
@@ -114,6 +141,7 @@ class Shifts extends WebController
             'in_to_time'=>$to_time,
         ]);
 
+        // 작업계획이 준비되지 않았으면 실패.
         if(empty($inner_counts)) {
             $results['isSave'] = false;
             $results['message'] = '勤務計画が準備されていません。';
