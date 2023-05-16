@@ -21,27 +21,47 @@ class Shifts extends WebController
         $this->load->model('setting_init_shift_model');
     }
 
+    public function forceSaveShift(){
 
-    public function addNewStaffShift(){
+        $shift_id = $this->input->post('shift_id');
         $organ_id = $this->input->post('organ_id');
         $staff_id = $this->input->post('staff_id');
         $from_time = $this->input->post('from_time');
         $to_time = $this->input->post('to_time');
         $shift_type = $this->input->post('shift_type');
 
-        $shift = array(
-            'organ_id' => $organ_id,
-            'staff_id' => $staff_id,
-            'from_time' => $from_time,
-            'to_time' => $to_time,
-            'shift_type' => $shift_type,
-            'visible' => 1,
-        );
-        $shift_id = $this->shift_model->insertRecord($shift);
-        
-        $result['isSave'] = true;
-        $result['shift_id'] = $shift_id;
-        echo json_encode($result);
+        // echo json_encode(['shift_id'=>$shift_id, 'organ_id'=>$organ_id]);
+        // return;
+
+        if(empty($staff_id)){
+            echo "[]";
+        } else {
+            if($shift_id < 1){
+                $shift = array(
+                    'organ_id' => $organ_id,
+                    'staff_id' => $staff_id,
+                    'from_time' => $from_time,
+                    'to_time' => $to_time,
+                    'shift_type' => $shift_type,
+                    'visible' => 1,
+                );
+                $shift_id = $this->shift_model->insertRecord($shift);
+            } else {
+                $shift = array(
+                    'shift_id' => $shift_id,
+                    'organ_id' => $organ_id,
+                    'staff_id' => $staff_id,
+                    'from_time' => $from_time,
+                    'to_time' => $to_time,
+                    'shift_type' => $shift_type,
+                );
+
+                $this->shift_model->updateRecord($shift, 'shift_id');
+            }
+            
+            $result['shift_id'] = $shift_id;
+            echo json_encode($result);
+        }
     }
 
 
