@@ -30,17 +30,28 @@ class Managements extends WebController
 
         $counts = $this->setting_count_shift_model->getListByCond(['organ_id' => $organ_id, 'from_time' => $from_time, 'to_time' => $to_time]);
         
-        for ($i=0; $i < count($counts); $i++) { 
-            // $counts[$i]['shifts'] = $this->shift_model->getListByCond(['organ_id' => $organ_id, 'from_time' => $counts[$i]['from_time'], 'to_time' => $counts[$i]['to_time'], 'psg'=>'1']);
-            // $apps = $this->shift_model->getListByCond(['organ_id' => $organ_id, 'from_time' => $counts[$i]['from_time'], 'to_time' => $counts[$i]['to_time'], 'is_apply' => '1']);
-
-            // $counts[$i]['apply'] = count($apps);
-            // $counts[$i]['count'] = count($counts[$i]['shifts']);//(!empty($cond['organ_id'])) ? count($counts[$i]['shifts']) : 0;
-            // $counts[$i]['shift'] = count($counts[$i]['shifts']);//(!empty($cond['organ_id'])) ? count($counts[$i]['shifts']) : 0;
-            $counts[$i]['apply'] = 0;
-            $counts[$i]['count'] = 0;
-            $counts[$i]['shift'] = 0;
+        // $times = [];
+        // foreach($counts as $count){
+        //     if(!array_search($count['from_time'], $times) && (empty($times) || $times[0]!=$count['from_time'])) $times[] = $count['from_time'];
+        //     if(!array_search($count['to_time'], $times) && (empty($times) || $times[0]!=$count['to_time'])) $times[] = $count['to_time'];
+        // }
+        
+        /* add by shengben
+        foreach($shifts as $shift){
+            if(!array_search($shift['from_time'], $times) && (empty($times) || $times[0]!=$shift['from_time'])) $times[] = $shift['from_time'];
+            if(!array_search($shift['to_time'], $times) && (empty($times) || $times[0]!=$shift['to_time'])) $times[] = $shift['to_time'];
         }
+        */
+
+        // sort($times);        
+
+        // for ($i=0; $i < count($counts); $i++) {
+        //     $counts[$i]['apply'] = 0;
+        //     $counts[$i]['shift'] = 0;
+            
+        //     $_counts = $this->setting_count_shift_model->getListByCond(['organ_id' => $organ_id, 'in_from_time' => $times[$i], 'in_to_time' => $times[$i+1]]);
+        //     $counts[$i]['count'] = empty($_counts) ? 0 : $_counts[0]['count'];
+        // }
 
         $results['data'] = $counts;
 
@@ -76,6 +87,7 @@ class Managements extends WebController
         $data = [];
         for($i=0; $i<count($times)-1; $i++){
             $tmp = [];
+
             $tmp['from_time'] = $times[$i];
             $tmp['to_time'] = $times[$i+1];
             $_counts = $this->setting_count_shift_model->getListByCond(['organ_id' => $organ_id, 'in_from_time' => $times[$i], 'in_to_time' => $times[$i+1]]);
