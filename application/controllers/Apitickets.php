@@ -22,8 +22,10 @@ class Apitickets extends WebController
 
     public function loadMasterTicket(){
         $company_id = $this->input->get_post('company_id');
+        $id = $this->input->get_post('id');
         
         $cond['company_id'] = $company_id;
+        $cond['id'] = $id;
         $results['ticket_master'] = $this->mst_ticket_model->getListByCond($cond);
 
         echo json_encode($results);
