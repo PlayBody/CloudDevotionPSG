@@ -18,7 +18,7 @@ class Receipt extends AdminController
 
         $this->header['page'] = 'epark';
         $this->header['sub_page'] = 'receipt';
-        $this->header['title'] = '予約受付';
+        $this->header['title'] = '予約受付'; //Reservation reception
 
         $this->load->model('organ_model');
         $this->load->model('organ_shift_time_model');

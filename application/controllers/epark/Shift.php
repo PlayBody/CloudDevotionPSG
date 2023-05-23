@@ -16,7 +16,7 @@ class Shift extends AdminController
 
         $this->header['page'] = 'epark';
         $this->header['sub_page'] = 'shift';
-        $this->header['title'] = '月間シフト作成';
+        $this->header['title'] = '月間シフト作成'; //Monthly shift creation.
 
 
         $this->load->model('company_model');
