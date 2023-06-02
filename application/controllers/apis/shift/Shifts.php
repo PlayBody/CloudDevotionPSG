@@ -19,10 +19,10 @@ class Shifts extends WebController
         $this->load->model('setting_count_shift_model');
         $this->load->model('shifts/shift_rest_model');
         $this->load->model('setting_init_shift_model');
+        $this->load->model('shift_meta_model');
     }
 
     public function forceSaveShift(){
-
         $shift_id = $this->input->post('shift_id');
         $organ_id = $this->input->post('organ_id');
         $staff_id = $this->input->post('staff_id');
@@ -47,6 +47,32 @@ class Shifts extends WebController
                 );
                 $shift_id = $this->shift_model->insertRecord($shift);
             } else {
+                $oldShift = $this->shift_model->getFromId($shift_id);
+                if($shift_type == SHIFT_STATUS_REJECT){
+                
+                    if($oldShift['shift_type'] == SHIFT_STATUS_APPLY ||
+                        $oldShift['shift_type'] == SHIFT_STATUS_ME_APPLY ||
+                        $oldShift['shift_type'] == SHIFT_STATUS_SUBMIT ){
+                        
+                        $st = $oldShift['from_time'];
+                        $en = $oldShift['to_time'];
+
+                        echo "ost".$st;
+                        echo "oen".$en;
+                        echo "st".$from_time;
+                        echo "en".$to_time;
+                        return;
+                        
+                        if($st < $from_time || $en > $to_time){
+                            $st = max($st, $from_time);
+                            $en = min($en, $to_time);
+                            if($st < $en){
+                                $this->shift_meta_model->saveData($shift_id, $st, $en);
+                            }
+                        }
+                    }
+                }
+
                 $shift = array(
                     'shift_id' => $shift_id,
                     'organ_id' => $organ_id,

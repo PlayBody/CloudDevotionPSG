@@ -180,7 +180,7 @@ class Base_model extends CI_Model
      *
      * 21//08/21 add By Kastumoto
      */
-    function updateRecord($data,$key='')
+    function updateRecord($data, $key='')
     {
         $data['update_date'] = date('Y-m-d H:i:s');
 

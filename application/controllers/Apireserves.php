@@ -776,6 +776,9 @@ class Apireserves extends WebController
         $curFromTime = new DateTime($cur_date);
         $curToTime = new DateTime($cur_date);
         $from_time = $curFromTime->format("Y-m-d H:i:s");
+        if(empty($duration)){
+            $duration = 0;
+        }
         $curToTime->add(new DateInterval('PT'.$duration.'M'));
         $to_time = $curToTime->format("Y-m-d H:i:s");
 
