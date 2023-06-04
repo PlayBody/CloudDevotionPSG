@@ -127,6 +127,8 @@ class Shifts extends WebController
                 $shift['to_time'] = $shift_meta['to_time'];
                 $this->shift_model->updateRecord($shift, 'shift_id');
                 $this->shift_meta_model->delete_force($shift_meta['meta_id'], 'meta_id');
+                $results['isSave'] = true;
+                echo json_encode($results);
                 return;
             }
 
@@ -181,16 +183,13 @@ class Shifts extends WebController
             'no_shift' => $shift_id,
         ]);
 
-        // 다른 시프트가 존재하면...
         if (!empty($exist_other_shifts)){
-            // 다른 시프트가 존재하므로 시간을 재검사할것을 요구.
             $results['isSave'] = false;
             $results['message'] = '入力したシフトが重複しました。時間を確認してください。';
             echo json_encode($results);
             return;
         }
 
-        // 작업계획이 준비된것이 있는가를 setting_cout_shift_model표에서 검색.
         // $isReadyCount = $this->isInCount($organ_id, $from_time, $to_time);
         $inner_counts = $this->setting_count_shift_model->getListByCond([
             'organ_id'=>$organ_id,
@@ -198,7 +197,6 @@ class Shifts extends WebController
             'in_to_time'=>$to_time,
         ]);
 
-        // 작업계획이 준비되지 않았으면 실패.
         if(empty($inner_counts)) {
             $results['isSave'] = false;
             $results['message'] = '勤務計画が準備されていません。';
