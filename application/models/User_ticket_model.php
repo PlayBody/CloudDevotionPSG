@@ -14,7 +14,8 @@ class User_ticket_model extends Base_model
     public function getListByCond($cond){
         $this->db->select($this->table.'.*, tickets.ticket_title, tickets.ticket_price02, tickets.ticket_count');
         $this->db->from($this->table);
-        $this->db->join('tickets', 'user_tickets.ticket_id=tickets.id', 'left');
+        $this->db->join('tickets', 'user_tickets.ticket_id=tickets.id', 'inner');
+        // $this->db->join('mst_tickets', 'tickets.ticket_id=mst_tickets.id', 'inner');
 
         if (!empty($cond['ticket_id'])){
             $this->db->where('ticket_id', $cond['ticket_id']);
