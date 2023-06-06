@@ -473,7 +473,8 @@ class Apiusers extends WebController
                     'smtp_host' => 'mail.visit-pos.net',
                     'smtp_port' => 587,
                     'smtp_user' => 'system@visit-pos.net',
-                    'smtp_pass' => '1#TQUr*zX-gF]Xx)',
+                    // 'smtp_pass' => '1#TQUr*zX-gF]Xx)',
+                    'smtp_pass' => 'nishioQWEqwe!@#123',
                 );
 
                 $this->load->library('email');

@@ -29,6 +29,7 @@ class Shifts extends WebController
         $from_time = $this->input->post('from_time');
         $to_time = $this->input->post('to_time');
         $shift_type = $this->input->post('shift_type');
+        $deleted = $this->input->post('deleted');
 
         // echo json_encode(['shift_id'=>$shift_id, 'organ_id'=>$organ_id]);
         // return;
@@ -47,41 +48,46 @@ class Shifts extends WebController
                 );
                 $shift_id = $this->shift_model->insertRecord($shift);
             } else {
-                $oldShift = $this->shift_model->getFromId($shift_id);
-                if($shift_type == SHIFT_STATUS_REQUEST){
-                    if($oldShift['shift_type'] == SHIFT_STATUS_APPLY ||
-                        $oldShift['shift_type'] == SHIFT_STATUS_ME_APPLY ||
-                        $oldShift['shift_type'] == SHIFT_STATUS_SUBMIT ){
-                        
-                        $ost = $oldShift['from_time'].".000";
-                        $oen = $oldShift['to_time'].".000";
+                if($deleted == '1'){
+                    $this->shift_model->delete_force($shift_id, 'shift_id');
+                } else {
 
-                        // echo "ost".$st;
-                        // echo "oen".$en;
-                        // echo "st".$from_time;
-                        // echo "en".$to_time;
-                        // return;
-                        
-                        if($ost > $from_time || $oen < $to_time){
-                            $st = max($ost, $from_time);
-                            $en = min($oen, $to_time);
-                            if($st < $en){
-                                $this->shift_meta_model->saveData($shift_id, $st, $en);
+                    $oldShift = $this->shift_model->getFromId($shift_id);
+                    if($shift_type == SHIFT_STATUS_REQUEST){
+                        if($oldShift['shift_type'] == SHIFT_STATUS_APPLY ||
+                            $oldShift['shift_type'] == SHIFT_STATUS_ME_APPLY ||
+                            $oldShift['shift_type'] == SHIFT_STATUS_SUBMIT ){
+                            
+                            $ost = $oldShift['from_time'].".000";
+                            $oen = $oldShift['to_time'].".000";
+    
+                            // echo "ost".$st;
+                            // echo "oen".$en;
+                            // echo "st".$from_time;
+                            // echo "en".$to_time;
+                            // return;
+                            
+                            if($ost > $from_time || $oen < $to_time){
+                                $st = max($ost, $from_time);
+                                $en = min($oen, $to_time);
+                                if($st < $en){
+                                    $this->shift_meta_model->saveData($shift_id, $st, $en);
+                                }
                             }
                         }
                     }
+    
+                    $shift = array(
+                        'shift_id' => $shift_id,
+                        'organ_id' => $organ_id,
+                        'staff_id' => $staff_id,
+                        'from_time' => $from_time,
+                        'to_time' => $to_time,
+                        'shift_type' => $shift_type,
+                    );
+    
+                    $this->shift_model->updateRecord($shift, 'shift_id');
                 }
-
-                $shift = array(
-                    'shift_id' => $shift_id,
-                    'organ_id' => $organ_id,
-                    'staff_id' => $staff_id,
-                    'from_time' => $from_time,
-                    'to_time' => $to_time,
-                    'shift_type' => $shift_type,
-                );
-
-                $this->shift_model->updateRecord($shift, 'shift_id');
             }
             
             $result['shift_id'] = $shift_id;
