@@ -30,6 +30,7 @@ class Shifts extends WebController
         $to_time = $this->input->post('to_time');
         $shift_type = $this->input->post('shift_type');
         $deleted = $this->input->post('deleted');
+        $ref_shift_id = $this->input->post('ref_shift_id');
 
         // echo json_encode(['shift_id'=>$shift_id, 'organ_id'=>$organ_id]);
         // return;
@@ -50,8 +51,17 @@ class Shifts extends WebController
             } else {
                 if($deleted == '1'){
                     $this->shift_model->delete_force($shift_id, 'shift_id');
+                    if($ref_shift_id != '0'){
+                        $oldShift = $this->shift_model->getFromId($ref_shift_id);
+                        if($oldShift['shift_type'] == SHIFT_STATUS_APPLY ||
+                            $oldShift['shift_type'] == SHIFT_STATUS_ME_APPLY ||
+                            $oldShift['shift_type'] == SHIFT_STATUS_SUBMIT ){
+                            if($from_time < $to_time){
+                                $this->shift_meta_model->saveData($ref_shift_id, $from_time, $to_time);
+                            }
+                        }
+                    }
                 } else {
-
                     $oldShift = $this->shift_model->getFromId($shift_id);
                     if($shift_type == SHIFT_STATUS_REQUEST){
                         if($oldShift['shift_type'] == SHIFT_STATUS_APPLY ||
@@ -61,12 +71,6 @@ class Shifts extends WebController
                             $ost = $oldShift['from_time'].".000";
                             $oen = $oldShift['to_time'].".000";
     
-                            // echo "ost".$st;
-                            // echo "oen".$en;
-                            // echo "st".$from_time;
-                            // echo "en".$to_time;
-                            // return;
-                            
                             if($ost > $from_time || $oen < $to_time){
                                 $st = max($ost, $from_time);
                                 $en = min($oen, $to_time);
@@ -104,7 +108,6 @@ class Shifts extends WebController
         $to_time = $this->input->post('to_time');
         $shift_type = $this->input->post('shift_type');
 
-
         if ($shift_type==SHIFT_STATUS_ME_REJECT){
             $shift = $this->shift_model->getFromId($shift_id);
             if (empty($shift)){
@@ -112,7 +115,7 @@ class Shifts extends WebController
                 echo json_encode($results);
                 return;
             }
-            $shift_meta = $this->shift_meta_model->get($shift_id, 'shift_id');
+            $shift_meta = $this->shift_meta_model->getDataByParam(["shift_id"=>$shift_id]);//$shift_id, 'shift_id');
             if(empty($shift_meta)){
                 if (empty($shift['old_shift'])){
                     $this->shift_model->delete_force($shift_id, 'shift_id');
@@ -129,10 +132,17 @@ class Shifts extends WebController
             } else {
                 $shift['shift_type'] = SHIFT_STATUS_APPLY;
                 $shift['old_shift'] = null;
-                $shift['from_time'] = $shift_meta['from_time'];
-                $shift['to_time'] = $shift_meta['to_time'];
-                $this->shift_model->updateRecord($shift, 'shift_id');
-                $this->shift_meta_model->delete_force($shift_meta['meta_id'], 'meta_id');
+                $this->shift_model->delete_force($shift_id, 'shift_id');
+                for($i = 0; $i < count($shift_meta); $i++){
+                    $meta = $shift_meta[$i];
+                    $shift['from_time'] = $meta['from_time'];
+                    $shift['to_time'] = $meta['to_time'];
+                    if (isset($shift['shift_id'])) {
+                        unset($shift['shift_id']);
+                    }
+                    $this->shift_model->insertRecord($shift);
+                    $this->shift_meta_model->delete_force($meta['meta_id'], 'meta_id');
+                }
                 $results['isSave'] = true;
                 echo json_encode($results);
                 return;

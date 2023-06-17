@@ -12,12 +12,12 @@ class Shift_meta_model extends Base_Model
 
     public function saveData($shift_id, $st, $en)
     {
-        $data = $this->get($shift_id, 'shift_id');
-        if(empty($data)){
-            $data = ["shift_id"=>$shift_id, "from_time"=>$st, "to_time"=>$en];
-            $this->insertRecord($data);
-        } else {
-            $this->updateRecord($data);
-        }
+        $data = ["shift_id"=>$shift_id, "from_time"=>$st, "to_time"=>$en];
+        $this->insertRecord($data);
+        // $data = $this->get($shift_id, 'shift_id');
+        // if(empty($data)){
+        // } else {
+        //     $this->updateRecord($data);
+        // }
     }
 }
