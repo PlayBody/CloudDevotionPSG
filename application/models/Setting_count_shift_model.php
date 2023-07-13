@@ -77,4 +77,20 @@ class Setting_count_shift_model extends Base_model
     }
 
 
+    public function getPositionCountByPeriod($organ_id, $from_time, $to_time){
+        $this->db->select('min(count) as position_count');
+        $this->db->from($this->table);
+        $this->db->where('organ_id', $organ_id);
+        $this->db->where("from_time <= '$to_time'");
+        $this->db->where("to_time > '$from_time'");
+        $this->db->where("count is not null");
+
+        $this->db->group_by('count');
+
+        $query = $this->db->get();
+        $result = $query->row_array();
+        if (empty($result)) return 0;
+        return $result['position_count'];
+    }
+    
 }

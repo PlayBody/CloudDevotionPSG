@@ -41,6 +41,7 @@ class Apireserves extends WebController
         $this->load->model('order_menu_model');
         $this->load->model('organ_time_model');
         $this->load->model('organ_special_time_model');
+        $this->load->model('setting_count_shift_model');
         //        $this->load->model('pos_staff_shift_model');
     }
 
@@ -731,6 +732,45 @@ class Apireserves extends WebController
 
     }
 
+    public function loadReserveShiftConditions(){
+        $organ_id = $this->input->post('organ_id');
+        $from_date = $this->input->post('from_date');
+        $to_date = $this->input->post('to_date');
+        $user_id = $this->input->post('user_id');
+        $duration = $this->input->post('duration');
+        
+        $results = [];
+        $regions = [];
+
+        $cur_date = $from_date;
+
+        $organ = $this->organ_model->getFromId($organ_id);
+        
+        while($cur_date<=$to_date){
+            $curDateTime = new DateTime($cur_date);
+
+            if ($curDateTime > new DateTime()){
+                $tmp = [];
+                $tmp['time'] = $cur_date;
+                $tmp['type'] = $this->getShiftTimeStatus($organ, $cur_date, $user_id, $duration);
+                $regions[] = $tmp;
+            }else{
+                $tmp = [];
+                $tmp['time'] = $cur_date;
+                $tmp['type'] = 0; // meiyou
+                $regions[] = $tmp;
+            }
+
+            $diff1Day = new DateInterval('PT5M');
+            $curDateTime->add($diff1Day);
+            $cur_date = $curDateTime->format("Y-m-d H:i:s");
+        }
+        $results['isLoad'] = true;
+        $results['regions'] = $regions;
+
+        echo json_encode($results);
+    }
+
     public function loadReserveConditions(){
 
         $organ_id = $this->input->post('organ_id');
@@ -770,6 +810,47 @@ class Apireserves extends WebController
 
         echo json_encode($results);
 
+    }
+
+    private function getShiftTimeStatus($organ, $cur_date, $user_id, $duration){
+        $organ_id = $organ['organ_id'];
+        $curFromTime = new DateTime($cur_date);
+        $curToTime = new DateTime($cur_date);
+        $from_time = $curFromTime->format("Y-m-d H:i:s");
+        if(empty($duration)){
+            $duration = 0;
+        }
+        $curToTime->add(new DateInterval('PT'.$duration.'M'));
+        $to_time = $curToTime->format("Y-m-d H:i:s");
+        
+        $table_count = $organ['table_count'] == null ? 10 : $organ['table_count'];
+
+        /* ------------------is my order check-------------------------- */
+        // cannot do double order.
+        $my_reserves = $this->order_model->getListByCond([
+            'user_id' => $user_id,
+            'in_from_time' => $from_time,
+            'in_to_time' => $to_time,
+            'is_with_interval' => 1,
+            'status_array' => [ORDER_STATUS_RESERVE_APPLY, ORDER_STATUS_RESERVE_REQUEST],
+        ]);
+        if (!empty($my_reserves)) return '3';
+        /* endcheck */
+
+        /* ------------------is count check-------------------------- */
+        $position_count = $this->order_model->getPositionCountByPeriod($organ_id, $from_time, $to_time);
+        if ($position_count >= $table_count) return '3';
+        //--------------------------------
+
+        $position_count = 0;
+
+        /* ------------------is shift count check ------------------- */
+        $shift_count = $this->setting_count_shift_model->getPositionCountByPeriod($organ_id, $from_time, $to_time);
+        if($position_count < $shift_count){
+            return '1'; // 〇: there is a vacancy
+        } else {
+            return '3';
+        }
     }
 
     private function getReserveTimeStatus($organ_id, $staff_id, $cur_date, $user_id, $duration, $staff_type){

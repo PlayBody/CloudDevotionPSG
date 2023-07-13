@@ -93,6 +93,7 @@ class Apisettings extends WebController
         $organ['set_time'] = empty($this->input->post('set_time')) ? null : $this->input->post('set_time');
         $organ['set_number'] =  $this->input->post('set_number');
         $organ['is_no_reserve'] = $this->input->post('is_no_reserve');
+        $organ['is_no_reserve_type'] = $this->input->post('is_no_reserve_type');
         $organ['is_use_set'] = $this->input->post('is_use_set');
         $organ['set_amount'] = empty($this->input->post('set_amount')) ? null : $this->input->post('set_amount');
         $organ['table_amount'] = empty($this->input->post('table_amount')) ? null : $this->input->post('table_amount');

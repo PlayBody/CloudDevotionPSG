@@ -231,6 +231,8 @@
                                                     if($shift['shift_type']==SHIFT_STATUS_REST){ echo '休み'; }
                                                     if($shift['shift_type']==SHIFT_STATUS_REQUEST){ echo '出勤依頼'; }
                                                     if($shift['shift_type']==SHIFT_STATUS_ME_REPLY){ echo '承認待ち'; }
+                                                    // if($shift['shift_type']==SHIFT_STATUS_APPLY){ echo '承認'; }
+                                                    // if($shift['shift_type']==SHIFT_STATUS_ME_APPLY){ echo '承認'; }
                                                 ?>
                                             </span>
                                             <p>
